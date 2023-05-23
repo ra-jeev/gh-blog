@@ -16,7 +16,8 @@ jobs:
       - name: Get list of new files
         id: new_files
         run: |
-          echo "new_files=$(git diff --name-only ${{ github.sha }} -- ${{ github.sha }}~)" >> $GITHUB_OUTPUT
+          git fetch
+          echo "new_files=$(git diff-tree --no-commit-id --name-only -r HEAD..${{ github.event.before }} | grep -E '\.md$')" >> $GITHUB_OUTPUT
 
       - name: Check if new files were added
         run: |
