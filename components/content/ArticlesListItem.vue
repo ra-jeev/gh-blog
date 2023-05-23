@@ -1,39 +1,43 @@
 <script setup lang="ts">
-import { useContentPreview } from '#imports'
+import { useContentPreview } from '#imports';
 
 type Article = {
-  _path: string
-  title: string
-  date: string
-  description: string
-  badges?: { bg: string, text: string, content: string }[]
-}
+  _path: string;
+  title: string;
+  date: string;
+  description: string;
+  badges?: { bg: string; text: string; content: string }[];
+};
 
 const props = defineProps({
   article: {
     type: Object,
     required: true,
     validator: (value: Article) => {
-      if (value?._path && value.title) { return true }
-      return false
-    }
+      if (value?._path && value.title) {
+        return true;
+      }
+      return false;
+    },
   },
   featured: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
 const id = computed(() => {
   // @ts-ignore
-  return (process.dev || useContentPreview()?.isEnabled()) ? props.article?._id : undefined
-})
+  return process.dev || useContentPreview()?.isEnabled()
+    ? props.article?._id
+    : undefined;
+});
 </script>
 
 <template>
   <article
     v-if="article._path && article.title"
-    :class="{ 'featured': featured }"
+    :class="{ featured: featured }"
     :data-content-id="id"
   >
     <div class="image">
@@ -43,7 +47,7 @@ const id = computed(() => {
           :key="index"
           :style="{
             backgroundColor: badge?.bg || 'rgba(0, 0, 0, 0.3)',
-            color: badge?.color || 'white'
+            color: badge?.color || 'white',
           }"
         >
           {{ typeof badge === 'string' ? badge : badge.content }}
@@ -51,9 +55,9 @@ const id = computed(() => {
       </div>
       <NuxtLink :to="article._path">
         <NuxtImg
-          v-if="article.cover"
-          :src="article.cover"
-          :alt="article.title"
+          v-if="article.image?.src"
+          :src="article.image.src"
+          :alt="article.image.alt"
           width="16"
           height="9"
         />
@@ -61,10 +65,7 @@ const id = computed(() => {
     </div>
 
     <div class="content">
-      <NuxtLink
-        :to="article._path"
-        class="headline"
-      >
+      <NuxtLink :to="article._path" class="headline">
         <h1>
           {{ article.title }}
         </h1>

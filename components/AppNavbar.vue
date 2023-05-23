@@ -1,24 +1,25 @@
 <script lang="ts" setup>
 const { navigation } = useContent();
 const appConfig = useAppConfig();
+const config = useRuntimeConfig();
 
 const admin = useState('isAdmin');
 
 const createNewPost = async () => {
   const auth = useFirebaseAuth();
   const idToken = await auth?.currentUser?.getIdToken();
-  console.log('got some id toekn: ', idToken);
   if (idToken) {
-    await fetch(
-      'https://rowy-hooks-xvwqpl77aq-ey.a.run.app/wh/users/FDJbSvtplGRyUWO8aJDS',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
-        body: JSON.stringify({ name: 'Rajeev', day: 'Not good' }),
-      }
-    );
+    const res = await fetch(config.public.START_CODESPACE_FN_URL, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      window.open(data.web_url, '_blank');
+    }
   }
 };
 </script>

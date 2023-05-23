@@ -4,7 +4,11 @@ import { withTrailingSlash } from 'ufo';
 const props = defineProps({
   path: {
     type: String,
-    default: 'articles',
+    default: 'blog',
+  },
+  limit: {
+    type: Number,
+    default: 25,
   },
 });
 
@@ -12,7 +16,10 @@ const props = defineProps({
 const { data: _articles } = await useAsyncData(
   'articles',
   async () =>
-    await queryContent(withTrailingSlash(props.path)).sort({ date: -1 }).find()
+    await queryContent(withTrailingSlash(props.path))
+      .limit(props.limit)
+      .sort({ date: -1 })
+      .find()
 );
 
 const articles = computed(() => _articles.value || []);
@@ -58,9 +65,6 @@ css({
       '@md': {
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
         gap: '{space.8}',
-      },
-      '@lg': {
-        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
       },
     }
   },

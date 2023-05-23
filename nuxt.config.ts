@@ -1,5 +1,8 @@
 export default defineNuxtConfig({
   extends: 'content-wind',
+  app: {
+    baseURL: '/gh-blog/', // baseURL: '/<repository>/'
+  },
   modules: ['nuxt-vuefire'],
   ssr: true,
   vuefire: {
@@ -11,6 +14,11 @@ export default defineNuxtConfig({
       appId: process.env.FIREBASE_APP_ID,
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+    },
+  },
+  runtimeConfig: {
+    public: {
+      START_CODESPACE_FN_URL: process.env.START_CODESPACE_FN_URL,
     },
   },
 });
