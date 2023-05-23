@@ -1,0 +1,63 @@
+name: Post Article to dev.to
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  new-post-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get list of new files
+        id: new_files
+        run: |
+          echo "::set-output name=new_files::$(git diff --name-only ${{ github.sha }} ${{ github.sha }}~)"
+
+      - name: Check if new files were added
+        run: |
+          folder_path="content/blog"
+          new_files="${{ steps.new_files.outputs.new_files }}"
+          if [[ -n $(grep -E "^$folder_path/" <<< "$new_files") ]]; then
+            echo "New files were added to the folder: $folder_path"
+            echo "::set-output name=new_files_exist::true"
+          else
+            echo "No new files were added to the folder: $folder_path"
+            echo "::set-output name=new_files_exist::false"
+          fi
+
+  subsequent-steps:
+    needs: new-post-check
+    runs-on: ubuntu-latest
+
+    if: ${{ needs.new-files-check.outputs.check_files == 'true' }}
+
+    steps:
+      - name: Install dependencies
+        run: npm install axios
+
+      - name: Post Article
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEV_API_KEY }}
+        run: |
+          npx axios.post('https://dev.to/api/articles', {
+            title: 'Your Article Title',
+            body_markdown: 'Your article content in markdown format',
+            published: false,
+            tags: ['dev.to', 'example'],
+          }, {
+            headers: {
+              'api-key': process.env.DEV_API_KEY,
+            },
+          })
+          .then(response => {
+            console.log('Article posted successfully!');
+            console.log(response.data);
+          })
+          .catch(error => {
+            console.error('Failed to post the article:', error);
+          })
