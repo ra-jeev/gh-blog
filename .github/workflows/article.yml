@@ -17,7 +17,7 @@ jobs:
         id: new_files
         run: |
           git fetch
-          echo $(git diff --name-only HEAD $(git rev-parse --abbrev-ref HEAD)^ -- '*/*.md') | tee /tmp/output.txt
+          echo $(git diff-tree --no-commit-id --name-only -r HEAD..${{ github.event.before }}) | tee /tmp/output.txt
           echo "new_files=$(cat /tmp/output.txt)" >> $GITHUB_OUTPUT
 
       - name: Check if new files were added
