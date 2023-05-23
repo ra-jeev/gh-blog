@@ -11,23 +11,31 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Get list of new files
         id: new_files
         run: |
-          echo "::set-output name=new_files::$(git diff --name-only ${{ github.sha }} ${{ github.sha }}~)"
+          echo "new_files=$(git diff --name-only ${{ github.sha }} -- ${{ github.sha }}~)" >> $GITHUB_OUTPUT
 
       - name: Check if new files were added
         run: |
           folder_path="content/blog"
           new_files="${{ steps.new_files.outputs.new_files }}"
-          if [[ -n $(grep -E "^$folder_path/" <<< "$new_files") ]]; then
+          matched_files=$(grep -E "^$folder_path/" <<< "$new_files")
+          if [[ -n $matched_files ]]; then
             echo "New files were added to the folder: $folder_path"
-            echo "::set-output name=new_files_exist::true"
+            echo "new_files_exist=true" >> $GITHUB_OUTPUT
+            IFS=$'\n'
+            for file in $matched_files; do
+              echo "File Name: $file"
+              echo "File Content:"
+              cat "$file"
+              echo "-------------------------"
+            done
           else
             echo "No new files were added to the folder: $folder_path"
-            echo "::set-output name=new_files_exist::false"
+            echo "new_files_exist=false" >> $GITHUB_OUTPUT
           fi
 
   subsequent-steps:
