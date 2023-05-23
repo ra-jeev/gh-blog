@@ -2,7 +2,7 @@
 title: "GitHub Codespaces: Collaborative Development Made Easy"
 description: Discover GitHub Codespaces—a cloud-based development environment for seamless collaboration, consistent setups, and enhanced productivity. Revolutionize your coding workflow now.s
 image:
-  src: /blog/codespaces.jpg
+  src: /blog/codespace.jpeg
   alt: A macbook screen showing code
 author:
   name: Rajeev R Sharma
