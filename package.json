@@ -1,0 +1,20 @@
+{
+  "name": "content-wind-template",
+  "private": true,
+  "scripts": {
+    "dev": "nuxi dev",
+    "build": "nuxi build",
+    "generate": "nuxi generate",
+    "preview": "nuxi preview"
+  },
+  "devDependencies": {
+    "content-wind": "latest",
+    "nuxt": "latest"
+  },
+  "dependencies": {
+    "firebase": "^9.22.0",
+    "firebase-admin": "^11.8.0",
+    "nuxt-vuefire": "^0.1.6",
+    "vuefire": "^3.1.0"
+  }
+}
