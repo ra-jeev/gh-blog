@@ -64,6 +64,15 @@ jobs:
 
       - name: Generate the static files
         run: ${{ steps.detect-package-manager.outputs.manager }} run generate
+        env:
+          # Setting an environment variable with the value of a configuration variable
+          FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+          FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+          FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+          FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+          FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+          START_CODESPACE_FN_URL: ${{ vars.START_CODESPACE_FN_URL }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
