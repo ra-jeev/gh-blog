@@ -3,6 +3,11 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/gh-blog/', // baseURL: '/<repository>/'
   },
+  nitro: {
+    prerender: {
+      routes: ['/login'],
+    },
+  },
   modules: ['nuxt-vuefire'],
   ssr: true,
   vuefire: {
