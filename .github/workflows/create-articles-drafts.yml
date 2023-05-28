@@ -1,0 +1,65 @@
+name: Create drafts on dev.to
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'content/blog/**.md'
+
+permissions:
+  contents: read
+
+jobs:
+  new-posts-check:
+    runs-on: ubuntu-latest
+
+    outputs:
+      num_added_files: ${{ steps.get_new_files.outputs.num_added_files }}
+      new_files: ${{ steps.get_new_files.outputs.new_files }}
+
+    steps:
+      - name: Get Files Added
+        id: get_new_files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/${{ github.repository }}/compare/${{ github.event.before }}...${{ github.event.after }} > /tmp/diff_data.json
+
+          new_files=$(jq -c '.files | map(select(.status == "added" and (.filename | startswith("content/blog"))) | {filename})' /tmp/diff_data.json)
+          echo "new files = $new_files"
+
+          num_added_files=$(echo "$new_files" | jq length)
+          echo "num_added_files = $num_added_files"
+
+          echo "num_added_files=$num_added_files" >> "$GITHUB_OUTPUT"
+          echo "new_files=$new_files" >> "$GITHUB_OUTPUT"
+
+  parse-and-create-drafts:
+    needs: new-posts-check
+    runs-on: ubuntu-latest
+
+    if: needs.new-posts-check.outputs.num_added_files > 0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup node env
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install axios gray-matter
+
+      - name: Parse markdown files and create drafts
+        env:
+          DEV_API_KEY: ${{ secrets.DEV_API_KEY }}
+          GH_PAGES_WEB_URL: 'https://${{github.repository_owner}}.github.io/${{github.event.repository.name}}'
+        run: |
+          node ./scripts/parseAndCreateDrafts.js '${{ needs.new-posts-check.outputs.new_files }}'
